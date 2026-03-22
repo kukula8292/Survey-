@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Survey Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2>Survey Dashboard</h2>
+
+<canvas id="supportChart"></canvas>
+<canvas id="motivationChart"></canvas>
+
+<script>
+let data = JSON.parse(localStorage.getItem("surveyData") || "[]");
+
+// Count function
+function count(field, value){
+  return data.filter(d => d[field] === value).length;
+}
+
+// Support chart
+new Chart(document.getElementById("supportChart"), {
+  type: 'bar',
+  data: {
+    labels: ["1","2","3","4"],
+    datasets: [{
+      label: "Support Level",
+      data: [
+        count("support","1"),
+        count("support","2"),
+        count("support","3"),
+        count("support","4")
+      ]
+    }]
+  }
+});
+
+// Motivation chart
+new Chart(document.getElementById("motivationChart"), {
+  type: 'bar',
+  data: {
+    labels: ["Yes","No"],
+    datasets: [{
+      label: "Motivation",
+      data: [
+        count("motivation","Yes"),
+        count("motivation","No")
+      ]
+    }]
+  }
+});
+</script>
+
+</body>
+</html>
