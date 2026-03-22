@@ -1,183 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Survey Analytics Dashboard</title>
-
-<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
-
-<style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
-  background-size: 400% 400%;
-  animation: gradientMove 12s ease infinite;
-  color: white;
-}
-
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-h2 {
-  text-align: center;
-  margin: 25px 10px;
-  font-size: 24px;
-}
-
-.container {
-  width: 95%;
-  max-width: 950px;
-  margin: auto;
-  padding-bottom: 40px;
-}
-
-.card {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 20px;
-  margin: 18px 0;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
-}
-
-.personBox {
-  background: rgba(255,255,255,0.12);
-  padding: 12px;
-  border-radius: 12px;
-  margin: 10px 0;
-}
-
-.personTitle {
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #ffffff;
-}
-
-.why {
-  margin-top: 5px;
-  font-size: 13px;
-  opacity: 0.85;
-  color: #ffcccb;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Dashboard</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        @media(max-width: 600px) {
+            body {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<h2>📊 Pyschology Survey Analytics</h2>
+<div class="card">
+    <h1>Survey Responses</h1>
+    <div id="responses"></div>
+</div>
 
-<div class="container" id="dashboard"></div>
+<script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js"></script>
+<script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        databaseURL: "YOUR_DATABASE_URL",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database(app);
 
-const firebaseConfig = {
-apiKey:"AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
-authDomain:"messages-9e5da.firebaseapp.com",
-databaseURL:"https://messages-9e5da-default-rtdb.firebaseio.com",
-projectId:"messages-9e5da",
-storageBucket:"messages-9e5da.firebasestorage.app",
-messagingSenderId:"1033254869246",
-appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const yesNo = v => v === "Yes" ? "👍 Yes" : "👎 No";
-
-const helpMap = {
-Never:"❌ Never",
-Sometimes:"🙂 Sometimes",
-Often:"🔥 Often",
-Always:"🚀 Always"
-};
-
-onValue(ref(db,"responses"), snap=>{
-const list = Object.values(snap.val() || {});
-
-let html = "";
-
-/* Q1 */
-html += `<div class="card"><h3>Q1 - Support (1–4 Scale)</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${d.support}</div>
-</div>`;
-});
-html += `</div>`;
-
-/* Q2 */
-html += `<div class="card"><h3>Q2 - Motivation</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${yesNo(d.motivation)}</div>
-${d.motivation === "No" && d.motivationWhy ? `<div class="why">Why: ${d.motivationWhy}</div>` : ""}
-</div>`;
-});
-html += `</div>`;
-
-/* Q3 */
-html += `<div class="card"><h3>Q3 - Help Frequency</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${helpMap[d.help] || d.help}</div>
-</div>`;
-});
-html += `</div>`;
-
-/* Q4 */
-html += `<div class="card"><h3>Q4 - Focus</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${yesNo(d.focus)}</div>
-${d.focus === "No" && d.focusWhy ? `<div class="why">Why: ${d.focusWhy}</div>` : ""}
-</div>`;
-});
-html += `</div>`;
-
-/* Q5 */
-html += `<div class="card"><h3>Q5 - Confidence</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${yesNo(d.confidence)}</div>
-${d.confidence === "No" && d.confidenceWhy ? `<div class="why">Why: ${d.confidenceWhy}</div>` : ""}
-</div>`;
-});
-html += `</div>`;
-
-/* Q6 */
-html += `<div class="card"><h3>Q6 - Engagement</h3>`;
-list.forEach((d,i)=>{
-html += `
-<div class="personBox">
-<div class="personTitle">Person ${i+1}</div>
-<div>Answer: ${yesNo(d.engagement)}</div>
-${d.engagement === "No" && d.engagementWhy ? `<div class="why">Why: ${d.engagementWhy}</div>` : ""}
-</div>`;
-});
-html += `</div>`;
-
-document.getElementById("dashboard").innerHTML = html;
-
-});
+    // Fetch and display survey responses
+    database.ref('surveyResponses').on('value', (snapshot) => {
+        const responses = snapshot.val();
+        const responsesDiv = document.getElementById('responses');
+        responsesDiv.innerHTML = '';
+        for (const id in responses) {
+            responsesDiv.innerHTML += `<p>${responses[id]}</p>`;
+        }
+    });
 </script>
 
 </body>
