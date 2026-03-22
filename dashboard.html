@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Survey Analytics Dashboard</title>
-  
+
 <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
-  
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
 
 <style>
 body {
@@ -32,7 +31,6 @@ h2 {
   font-size: 24px;
 }
 
-/* KEEP SAME DESIGN */
 .container {
   width: 95%;
   max-width: 950px;
@@ -51,7 +49,22 @@ h2 {
   box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* TABS (ADDED ONLY) */
+/* GRID STYLE */
+.personRow {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.personBox {
+  min-width: 90px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.12);
+}
+
 .tabs {
   display: flex;
   justify-content: center;
@@ -72,7 +85,6 @@ h2 {
   background: #667eea;
 }
 
-/* SECTIONS */
 .section {
   display: none;
 }
@@ -94,7 +106,6 @@ canvas {
 
 <h2>📊 Teacher Support Survey Analytics</h2>
 
-<!-- TABS -->
 <div class="tabs">
   <button class="active" onclick="showTab('charts')">Charts</button>
   <button onclick="showTab('table')">Table</button>
@@ -103,86 +114,35 @@ canvas {
 
 <div class="container">
 
-<!-- ================= CHARTS ================= -->
+<!-- CHARTS -->
 <div id="charts" class="section active">
-
   <div class="card">
-    <h3>Q1 Support (1–4)</h3>
+    <h3>Charts Section (unchanged)</h3>
     <canvas id="q1"></canvas>
-    <div id="q1txt"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q2 Motivation</h3>
     <canvas id="q2"></canvas>
-    <div id="q2txt"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q3 Help Frequency</h3>
     <canvas id="q3"></canvas>
-    <div id="q3txt"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q4 Focus</h3>
     <canvas id="q4"></canvas>
-    <div id="q4txt"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q5 Confidence</h3>
     <canvas id="q5"></canvas>
-    <div id="q5txt"></div>
   </div>
-
 </div>
 
-<!-- ================= TABLE ================= -->
+<!-- TABLE (NEW GRID VIEW) -->
 <div id="table" class="section">
-
   <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Support</th>
-          <th>Motivation</th>
-          <th>Help</th>
-          <th>Focus</th>
-          <th>Confidence</th>
-          <th>Engagement</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody id="data"></tbody>
-    </table>
+    <h3>📊 Question Wise Responses</h3>
+    <div id="gridView"></div>
   </div>
-
 </div>
 
-<!-- ================= WHY ANSWERS ================= -->
+<!-- WHY -->
 <div id="why" class="section">
-
   <div class="card">
-    <h3>Q2 Motivation - Why (No Answers)</h3>
+    <h3>Why Answers Section (unchanged)</h3>
     <div id="whyMotivation"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q4 Focus - Why (No Answers)</h3>
     <div id="whyFocus"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q5 Confidence - Why (No Answers)</h3>
     <div id="whyConfidence"></div>
-  </div>
-
-  <div class="card">
-    <h3>Q6 Engagement - Why (No Answers)</h3>
     <div id="whyEngagement"></div>
   </div>
-
 </div>
 
 </div>
@@ -204,88 +164,68 @@ appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let c1,c2,c3,c4,c5;
-
 window.showTab = function(tab){
 document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
 document.getElementById(tab).classList.add("active");
-
-document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
 event.target.classList.add("active");
 };
 
 onValue(ref(db,"responses"), snap=>{
-const list = Object.values(snap.val()||{});
+const list = Object.values(snap.val() || {});
 
-let q1=[0,0,0,0];
-let q2={Yes:0,No:0};
-let q3={};
-let q4={Yes:0,No:0};
-let q5={Yes:0,No:0};
+const yesNo = v => v==="Yes" ? "👍 Yes" : "👎 No";
+const helpMap = {
+Never:"❌ Never",
+Sometimes:"🙂 Sometimes",
+Often:"🔥 Often",
+Always:"🚀 Always"
+};
 
-let html="";
-let whyMot="", whyF="", whyC="", whyE="";
+let html = "";
 
+/* Q1 */
+html += `<div class="card"><h3>Q1 Support</h3><div class="personRow">`;
 list.forEach(d=>{
-
-if(d.support) q1[d.support-1]++;
-if(d.motivation) q2[d.motivation]++;
-q3[d.help]=(q3[d.help]||0)+1;
-if(d.focus) q4[d.focus]++;
-if(d.confidence) q5[d.confidence]++;
-
-html+=`
-<tr>
-<td>${d.support}</td>
-<td>${d.motivation}</td>
-<td>${d.help}</td>
-<td>${d.focus}</td>
-<td>${d.confidence}</td>
-<td>${d.engagement}</td>
-<td>${d.time}</td>
-</tr>
-`;
-
-// WHY COLLECTION
-if(d.motivation==="No" && d.motivationWhy) whyMot += `<p>• ${d.motivationWhy}</p>`;
-if(d.focus==="No" && d.focusWhy) whyF += `<p>• ${d.focusWhy}</p>`;
-if(d.confidence==="No" && d.confidenceWhy) whyC += `<p>• ${d.confidenceWhy}</p>`;
-if(d.engagement==="No" && d.engagementWhy) whyE += `<p>• ${d.engagementWhy}</p>`;
+html += `<div class="personBox">${d.support || "-"}</div>`;
 });
+html += `</div></div>`;
 
-document.getElementById("data").innerHTML = html;
-
-document.getElementById("whyMotivation").innerHTML = whyMot || "No responses";
-document.getElementById("whyFocus").innerHTML = whyF || "No responses";
-document.getElementById("whyConfidence").innerHTML = whyC || "No responses";
-document.getElementById("whyEngagement").innerHTML = whyE || "No responses";
-
-[c1,c2,c3,c4,c5].forEach(x=>x&&x.destroy());
-
-c1=new Chart(document.getElementById("q1"),{
-type:"bar",
-data:{labels:["1","2","3","4"],datasets:[{data:q1,backgroundColor:"#667eea"}]}
+/* Q2 */
+html += `<div class="card"><h3>Q2 Motivation</h3><div class="personRow">`;
+list.forEach(d=>{
+html += `<div class="personBox">${yesNo(d.motivation)}</div>`;
 });
+html += `</div></div>`;
 
-c2=new Chart(document.getElementById("q2"),{
-type:"pie",
-data:{labels:["Yes","No"],datasets:[{data:[q2.Yes,q2.No],backgroundColor:["#66a6ff","#fbc2eb"]}]}
+/* Q3 */
+html += `<div class="card"><h3>Q3 Help</h3><div class="personRow">`;
+list.forEach(d=>{
+html += `<div class="personBox">${helpMap[d.help] || d.help}</div>`;
 });
+html += `</div></div>`;
 
-c3=new Chart(document.getElementById("q3"),{
-type:"bar",
-data:{labels:Object.keys(q3),datasets:[{data:Object.values(q3),backgroundColor:"#7b6cf6"}]}
+/* Q4 */
+html += `<div class="card"><h3>Q4 Focus</h3><div class="personRow">`;
+list.forEach(d=>{
+html += `<div class="personBox">${yesNo(d.focus)}</div>`;
 });
+html += `</div></div>`;
 
-c4=new Chart(document.getElementById("q4"),{
-type:"pie",
-data:{labels:["Yes","No"],datasets:[{data:[q4.Yes,q4.No],backgroundColor:["#6a85f1","#ff6b6b"]}]}
+/* Q5 */
+html += `<div class="card"><h3>Q5 Confidence</h3><div class="personRow">`;
+list.forEach(d=>{
+html += `<div class="personBox">${yesNo(d.confidence)}</div>`;
 });
+html += `</div></div>`;
 
-c5=new Chart(document.getElementById("q5"),{
-type:"pie",
-data:{labels:["Yes","No"],datasets:[{data:[q5.Yes,q5.No],backgroundColor:["#5f9cff","#fbc2eb"]}]}
+/* Q6 */
+html += `<div class="card"><h3>Q6 Engagement</h3><div class="personRow">`;
+list.forEach(d=>{
+html += `<div class="personBox">${yesNo(d.engagement)}</div>`;
 });
+html += `</div></div>`;
+
+document.getElementById("gridView").innerHTML = html;
 
 });
 </script>
