@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Survey Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+
+canvas {
+  max-width: 600px;
+  margin: 30px auto;
+}
+</style>
 </head>
+
 <body>
 
 <h2>Survey Dashboard</h2>
@@ -11,44 +27,50 @@
 <canvas id="supportChart"></canvas>
 <canvas id="motivationChart"></canvas>
 
-<script>
-let data = JSON.parse(localStorage.getItem("surveyData") || "[]");
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Count function
-function count(field, value){
-  return data.filter(d => d[field] === value).length;
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
+  authDomain: "messages-9e5da.firebaseapp.com",
+  databaseURL: "https://messages-9e5da-default-rtdb.firebaseio.com",
+  projectId: "messages-9e5da",
+  storageBucket: "messages-9e5da.firebasestorage.app",
+  messagingSenderId: "1033254869246",
+  appId: "1:1033254869246:web:4c2b01a374c85ca509adaf"
+};
 
-// Support chart
-new Chart(document.getElementById("supportChart"), {
-  type: 'bar',
-  data: {
-    labels: ["1","2","3","4"],
-    datasets: [{
-      label: "Support Level",
-      data: [
-        count("support","1"),
-        count("support","2"),
-        count("support","3"),
-        count("support","4")
-      ]
-    }]
-  }
-});
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-// Motivation chart
-new Chart(document.getElementById("motivationChart"), {
-  type: 'bar',
-  data: {
-    labels: ["Yes","No"],
-    datasets: [{
-      label: "Motivation",
-      data: [
-        count("motivation","Yes"),
-        count("motivation","No")
-      ]
-    }]
-  }
+onValue(ref(db, "responses"), (snapshot) => {
+  const data = snapshot.val();
+  const list = Object.values(data || {});
+
+  let support = [0,0,0,0];
+  let motivation = {Yes:0, No:0};
+
+  list.forEach(d => {
+    support[d.support-1]++;
+    motivation[d.motivation]++;
+  });
+
+  new Chart(document.getElementById("supportChart"), {
+    type: 'bar',
+    data: {
+      labels: ["1","2","3","4"],
+      datasets: [{ label: "Support Levels", data: support }]
+    }
+  });
+
+  new Chart(document.getElementById("motivationChart"), {
+    type: 'bar',
+    data: {
+      labels: ["Yes","No"],
+      datasets: [{ label: "Motivation", data: [motivation.Yes, motivation.No] }]
+    }
+  });
 });
 </script>
 
