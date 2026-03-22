@@ -1,69 +1,283 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Dashboard</title>
-    <style>
-        body {
-            background: linear-gradient(45deg, #ff6b6b, #f7b733);
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
-        }
-        h2 {
-            color: #fff;
-        }
-    </style>
-</head>
-<body>
-    <div class="container" id="surveyContainer">
-    </div>
-    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-database.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survey Analytics Dashboard</title>
 
-        db.ref('surveys').once('value').then(snapshot => {
-            const surveyData = snapshot.val();
-            const container = document.getElementById('surveyContainer');
-            for (const [key, value] of Object.entries(surveyData)) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<h2>Survey Question ${key}</h2><p>${value.question}</p><p>Responses: ${Object.values(value.responses).join(', ')}</p>`;
-                container.appendChild(card);
-            }
-        });
-    </script>
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  padding: 16px;
+  min-height: 100vh;
+  color: white;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+h2 {
+  text-align: center;
+  margin: 25px 10px;
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.container {
+  width: 95%;
+  max-width: 950px;
+  margin: auto;
+  padding-bottom: 40px;
+}
+
+.card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.7);
+  padding: 20px;
+  margin: 18px 0;
+  border-radius: 24px;
+  box-shadow: 
+    0 8px 32px rgba(31, 38, 135, 0.15),
+    inset 0 0 20px rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:hover {
+  box-shadow: 
+    0 16px 48px rgba(31, 38, 135, 0.3),
+    inset 0 0 30px rgba(255, 255, 255, 0.6);
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.personBox {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  padding: 12px;
+  border-radius: 16px;
+  margin: 10px 0;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.personBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.12);
+}
+
+.personTitle {
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #2c3e50;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.personBox > div:not(.personTitle) {
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.why {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.85;
+  color: #e74c3c;
+  padding: 8px;
+  background: rgba(255, 0, 0, 0.05);
+  border-left: 3px solid #e74c3c;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 0;
+  }
+
+  .card {
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 20px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: 16px 8px;
+  }
+
+  .personBox {
+    padding: 10px;
+    margin: 8px 0;
+  }
+
+  .personTitle {
+    font-size: 11px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<h2>📊 Psychology Survey Analytics</h2>
+
+<div class="container" id="dashboard"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
+authDomain:"messages-9e5da.firebaseapp.com",
+databaseURL:"https://messages-9e5da-default-rtdb.firebaseio.com",
+projectId:"messages-9e5da",
+storageBucket:"messages-9e5da.firebasestorage.app",
+messagingSenderId:"1033254869246",
+appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const yesNo = v => v === "Yes" ? "👍 Yes" : "👎 No";
+
+const helpMap = {
+Never:"❌ Never",
+Sometimes:"🙂 Sometimes",
+Often:"🔥 Often",
+Always:"🚀 Always"
+};
+
+onValue(ref(db,"responses"), snap=>{
+const list = Object.values(snap.val() || {});
+
+let html = "";
+
+/* Q1 */
+html += `<div class="card"><h3>Q1 - Support (1–4 Scale)</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${d.support}</div>
+</div>`;
+});
+html += `</div>`;
+
+/* Q2 */
+html += `<div class="card"><h3>Q2 - Motivation</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.motivation)}</div>
+${d.motivation === "No" && d.motivationWhy ? `<div class="why">Why: ${d.motivationWhy}</div>` : ""}
+</div>`;
+});
+html += `</div>`;
+
+/* Q3 */
+html += `<div class="card"><h3>Q3 - Help Frequency</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${helpMap[d.help] || d.help}</div>
+</div>`;
+});
+html += `</div>`;
+
+/* Q4 */
+html += `<div class="card"><h3>Q4 - Focus</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.focus)}</div>
+${d.focus === "No" && d.focusWhy ? `<div class="why">Why: ${d.focusWhy}</div>` : ""}
+</div>`;
+});
+html += `</div>`;
+
+/* Q5 */
+html += `<div class="card"><h3>Q5 - Confidence</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.confidence)}</div>
+${d.confidence === "No" && d.confidenceWhy ? `<div class="why">Why: ${d.confidenceWhy}</div>` : ""}
+</div>`;
+});
+html += `</div>`;
+
+/* Q6 */
+html += `<div class="card"><h3>Q6 - Engagement</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.engagement)}</div>
+${d.engagement === "No" && d.engagementWhy ? `<div class="why">Why: ${d.engagementWhy}</div>` : ""}
+</div>`;
+});
+html += `</div>`;
+
+document.getElementById("dashboard").innerHTML = html;
+
+});
+</script>
+
 </body>
 </html>
