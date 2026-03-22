@@ -1,78 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Teacher Support Survey</title>
+<meta charset="UTF-8">
+<title>Teacher Support Survey</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  animation: bgShift 10s infinite alternate;
+}
+
+@keyframes bgShift {
+  0% { background: linear-gradient(135deg, #667eea, #764ba2); }
+  50% { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+  100% { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+}
+
+.form-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 600px;
+  margin: 60px auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question { margin-bottom: 20px; }
+.question:hover { transform: scale(1.02); }
+
+select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #667eea;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.thankyou {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: #111;
+  color: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 22px;
+  z-index: 1000;
+  animation: graffiti 0.6s forwards;
+}
+
+@keyframes graffiti {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+footer {
+  text-align: center;
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+}
+
+.emoji {
+  position: fixed;
+  top: -50px;
+  font-size: 24px;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh); }
+}
+</style>
+
 </head>
 <body>
 
-<h2>Teacher Support Survey</h2>
+<div class="form-card">
+  <h2>Teacher Support Survey</h2>
 
-<form id="surveyForm">
-  <label>1. Support Level (1-4):</label><br>
-  <select id="support">
-    <option>1</option>
-    <option>2</option>
-    <option>3</option>
-    <option>4</option>
-  </select><br><br>
+  <form id="surveyForm">
 
-  <label>2. Motivated with encouragement?</label><br>
-  <select id="motivation">
-    <option>Yes</option>
-    <option>No</option>
-  </select><br><br>
+    <div class="question">
+      <label>1. Support level:</label>
+      <select id="support">
+        <option value="1">1 - Very Little</option>
+        <option value="2">2 - Some</option>
+        <option value="3">3 - Sufficient</option>
+        <option value="4">4 - High Support</option>
+      </select>
+    </div>
 
-  <label>3. Ask teacher for help?</label><br>
-  <select id="help">
-    <option>Never</option>
-    <option>Sometimes</option>
-    <option>Often</option>
-    <option>Always</option>
-  </select><br><br>
+    <div class="question">
+      <label>2. Motivated by encouragement?</label>
+      <select id="motivation">
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
 
-  <label>4. Does support improve focus?</label><br>
-  <select id="focus">
-    <option>Yes</option>
-    <option>No</option>
-  </select><br><br>
+    <div class="question">
+      <label>3. Ask for help?</label>
+      <select id="help">
+        <option>Never</option>
+        <option>Sometimes</option>
+        <option>Often</option>
+        <option>Always</option>
+      </select>
+    </div>
 
-  <label>5. Confidence due to encouragement?</label><br>
-  <select id="confidence">
-    <option>Yes</option>
-    <option>No</option>
-  </select><br><br>
+    <div class="question">
+      <label>4. Does support improve focus?</label>
+      <select id="focus">
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
 
-  <label>6. Want more interactive feedback?</label><br>
-  <select id="engagement">
-    <option>Yes</option>
-    <option>No</option>
-  </select><br><br>
+    <div class="question">
+      <label>5. Confidence from encouragement?</label>
+      <select id="confidence">
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
 
-  <button type="submit">Submit</button>
-</form>
+    <div class="question">
+      <label>6. More interactive feedback?</label>
+      <select id="engagement">
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
 
-<br>
-<a href="dashboard.html">Go to Dashboard</a>
+    <button type="submit">Submit</button>
 
-<script>
+  </form>
+</div>
+
+<footer>✨ Made by Newan & Brain ✨</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
+  authDomain: "messages-9e5da.firebaseapp.com",
+  databaseURL: "https://messages-9e5da-default-rtdb.firebaseio.com",
+  projectId: "messages-9e5da",
+  storageBucket: "messages-9e5da.firebasestorage.app",
+  messagingSenderId: "1033254869246",
+  appId: "1:1033254869246:web:4c2b01a374c85ca509adaf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 document.getElementById("surveyForm").onsubmit = function(e){
   e.preventDefault();
 
-  let data = JSON.parse(localStorage.getItem("surveyData") || "[]");
-
-  data.push({
-    support: document.getElementById("support").value,
-    motivation: document.getElementById("motivation").value,
-    help: document.getElementById("help").value,
-    focus: document.getElementById("focus").value,
-    confidence: document.getElementById("confidence").value,
-    engagement: document.getElementById("engagement").value
+  push(ref(db, "responses"), {
+    support: support.value,
+    motivation: motivation.value,
+    help: help.value,
+    focus: focus.value,
+    confidence: confidence.value,
+    engagement: engagement.value,
+    time: new Date().toLocaleString()
   });
 
-  localStorage.setItem("surveyData", JSON.stringify(data));
+  let msg = document.createElement("div");
+  msg.className = "thankyou";
+  msg.innerHTML = "🔥 THANK YOU! 🔥<br>Response submitted 📊";
+  document.body.appendChild(msg);
 
-  alert("Response saved!");
+  document.getElementById("surveyForm").reset();
 };
+
+// Emoji rain
+const emojis = ["📚","✏️","🧠","🎓","📝"];
+setInterval(() => {
+  let e = document.createElement("div");
+  e.className = "emoji";
+  e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*100 + "vw";
+  e.style.animationDuration = (Math.random()*3+3)+"s";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),6000);
+},300);
+
 </script>
 
 </body>
