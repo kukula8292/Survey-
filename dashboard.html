@@ -11,106 +11,176 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
   color: white;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 h2 {
   text-align: center;
-  margin: 20px 0;
+  margin: 25px 10px;
+  font-size: 24px;
 }
 
+/* KEEP SAME DESIGN */
 .container {
   width: 95%;
-  max-width: 900px;
+  max-width: 950px;
   margin: auto;
+  padding-bottom: 40px;
 }
 
 .card {
   background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
   padding: 20px;
-  margin: 20px 0;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  animation: fade 0.4s ease;
+  margin: 18px 0;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+/* TABS (ADDED ONLY) */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 20px;
 }
 
-.title {
-  font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 16px;
+.tabs button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.15);
+  color: white;
 }
 
-.summary {
-  margin: 10px 0;
-  font-size: 15px;
-  line-height: 1.6;
+.tabs button.active {
+  background: #667eea;
+}
+
+/* SECTIONS */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
 }
 
 canvas {
-  background: white;
-  border-radius: 10px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
   padding: 10px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Teacher Support Survey Analytics</h2>
+<h2>📊 Teacher Support Survey Analytics</h2>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="active" onclick="showTab('charts')">Charts</button>
+  <button onclick="showTab('table')">Table</button>
+  <button onclick="showTab('why')">Why Answers</button>
+</div>
 
 <div class="container">
 
-  <!-- Q1 -->
+<!-- ================= CHARTS ================= -->
+<div id="charts" class="section active">
+
   <div class="card">
-    <div class="title">
-      Q1: On a scale of 1-4, how much support (help/feedback) do you feel you receive from your teachers?
-    </div>
-    <div class="summary" id="q1Text"></div>
-    <canvas id="q1Chart"></canvas>
+    <h3>Q1 Support (1–4)</h3>
+    <canvas id="q1"></canvas>
+    <div id="q1txt"></div>
   </div>
 
-  <!-- Q2 -->
   <div class="card">
-    <div class="title">
-      Q2: Do you feel more motivated to study when teachers provide regular encouragement?
-    </div>
-    <div class="summary" id="q2Text"></div>
-    <canvas id="q2Chart"></canvas>
+    <h3>Q2 Motivation</h3>
+    <canvas id="q2"></canvas>
+    <div id="q2txt"></div>
   </div>
 
-  <!-- Q3 -->
   <div class="card">
-    <div class="title">
-      Q3: Do you think teacher support improves your ability to focus and learn?
-    </div>
-    <div class="summary" id="q3Text"></div>
-    <canvas id="q3Chart"></canvas>
+    <h3>Q3 Help Frequency</h3>
+    <canvas id="q3"></canvas>
+    <div id="q3txt"></div>
   </div>
 
-  <!-- Q4 -->
   <div class="card">
-    <div class="title">
-      Q4: Have you ever felt more confident in an exam because of teacher encouragement?
-    </div>
-    <div class="summary" id="q4Text"></div>
-    <canvas id="q4Chart"></canvas>
+    <h3>Q4 Focus</h3>
+    <canvas id="q4"></canvas>
+    <div id="q4txt"></div>
   </div>
 
-  <!-- Q5 -->
   <div class="card">
-    <div class="title">
-      Q5: Would you be more engaged if teachers provided more interactive feedback?
-    </div>
-    <div class="summary" id="q5Text"></div>
-    <canvas id="q5Chart"></canvas>
+    <h3>Q5 Confidence</h3>
+    <canvas id="q5"></canvas>
+    <div id="q5txt"></div>
   </div>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+<div id="table" class="section">
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Support</th>
+          <th>Motivation</th>
+          <th>Help</th>
+          <th>Focus</th>
+          <th>Confidence</th>
+          <th>Engagement</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="data"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ================= WHY ANSWERS ================= -->
+<div id="why" class="section">
+
+  <div class="card">
+    <h3>Q2 Motivation - Why (No Answers)</h3>
+    <div id="whyMotivation"></div>
+  </div>
+
+  <div class="card">
+    <h3>Q4 Focus - Why (No Answers)</h3>
+    <div id="whyFocus"></div>
+  </div>
+
+  <div class="card">
+    <h3>Q5 Confidence - Why (No Answers)</h3>
+    <div id="whyConfidence"></div>
+  </div>
+
+  <div class="card">
+    <h3>Q6 Engagement - Why (No Answers)</h3>
+    <div id="whyEngagement"></div>
+  </div>
+
+</div>
 
 </div>
 
@@ -119,121 +189,101 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
-  authDomain: "messages-9e5da.firebaseapp.com",
-  databaseURL: "https://messages-9e5da-default-rtdb.firebaseio.com",
-  projectId: "messages-9e5da",
-  storageBucket: "messages-9e5da.firebasestorage.app",
-  messagingSenderId: "1033254869246",
-  appId: "1:1033254869246:web:4c2b01a374c85ca509adaf"
+apiKey:"AIzaSyBorukwZKOeJaxEYqY57zL1W-8zjevQlhg",
+authDomain:"messages-9e5da.firebaseapp.com",
+databaseURL:"https://messages-9e5da-default-rtdb.firebaseio.com",
+projectId:"messages-9e5da",
+storageBucket:"messages-9e5da.firebasestorage.app",
+messagingSenderId:"1033254869246",
+appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let q1Chart, q2Chart, q3Chart, q4Chart, q5Chart;
+let c1,c2,c3,c4,c5;
 
-onValue(ref(db, "responses"), (snapshot) => {
-  const data = snapshot.val();
-  const list = Object.values(data || []);
+window.showTab = function(tab){
+document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+document.getElementById(tab).classList.add("active");
 
-  // Q1 (1–4 scale)
-  let q1 = [0,0,0,0];
+document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+event.target.classList.add("active");
+};
 
-  // Yes/No questions
-  let q2 = {Yes:0, No:0};
-  let q3 = {Yes:0, No:0};
-  let q4 = {Yes:0, No:0};
-  let q5 = {Yes:0, No:0};
+onValue(ref(db,"responses"), snap=>{
+const list = Object.values(snap.val()||{});
 
-  list.forEach(d => {
-    if (d.support) q1[d.support - 1]++;
-    if (d.motivation) q2[d.motivation]++;
-    if (d.focus) q3[d.focus]++;
-    if (d.confidence) q4[d.confidence]++;
-    if (d.engagement) q5[d.engagement]++;
-  });
+let q1=[0,0,0,0];
+let q2={Yes:0,No:0};
+let q3={};
+let q4={Yes:0,No:0};
+let q5={Yes:0,No:0};
 
-  // TEXT SUMMARY
-  document.getElementById("q1Text").innerHTML =
-    `Total responses: ${list.length}<br>
-    1 (Very Little): ${q1[0]}<br>
-    2 (Some): ${q1[1]}<br>
-    3 (Sufficient): ${q1[2]}<br>
-    4 (High Support): ${q1[3]}`;
+let html="";
+let whyMot="", whyF="", whyC="", whyE="";
 
-  document.getElementById("q2Text").innerHTML =
-    `Yes: ${q2.Yes} students<br>No: ${q2.No} students`;
+list.forEach(d=>{
 
-  document.getElementById("q3Text").innerHTML =
-    `Yes: ${q3.Yes} students<br>No: ${q3.No} students`;
+if(d.support) q1[d.support-1]++;
+if(d.motivation) q2[d.motivation]++;
+q3[d.help]=(q3[d.help]||0)+1;
+if(d.focus) q4[d.focus]++;
+if(d.confidence) q5[d.confidence]++;
 
-  document.getElementById("q4Text").innerHTML =
-    `Yes: ${q4.Yes} students<br>No: ${q4.No} students`;
+html+=`
+<tr>
+<td>${d.support}</td>
+<td>${d.motivation}</td>
+<td>${d.help}</td>
+<td>${d.focus}</td>
+<td>${d.confidence}</td>
+<td>${d.engagement}</td>
+<td>${d.time}</td>
+</tr>
+`;
 
-  document.getElementById("q5Text").innerHTML =
-    `Yes: ${q5.Yes} students<br>No: ${q5.No} students`;
+// WHY COLLECTION
+if(d.motivation==="No" && d.motivationWhy) whyMot += `<p>• ${d.motivationWhy}</p>`;
+if(d.focus==="No" && d.focusWhy) whyF += `<p>• ${d.focusWhy}</p>`;
+if(d.confidence==="No" && d.confidenceWhy) whyC += `<p>• ${d.confidenceWhy}</p>`;
+if(d.engagement==="No" && d.engagementWhy) whyE += `<p>• ${d.engagementWhy}</p>`;
+});
 
-  // destroy old charts
-  [q1Chart,q2Chart,q3Chart,q4Chart,q5Chart].forEach(c => c && c.destroy());
+document.getElementById("data").innerHTML = html;
 
-  // CHARTS
+document.getElementById("whyMotivation").innerHTML = whyMot || "No responses";
+document.getElementById("whyFocus").innerHTML = whyF || "No responses";
+document.getElementById("whyConfidence").innerHTML = whyC || "No responses";
+document.getElementById("whyEngagement").innerHTML = whyE || "No responses";
 
-  q1Chart = new Chart(document.getElementById("q1Chart"), {
-    type: "bar",
-    data: {
-      labels: ["1","2","3","4"],
-      datasets: [{
-        label: "Support Level",
-        data: q1,
-        backgroundColor: "#667eea"
-      }]
-    }
-  });
+[c1,c2,c3,c4,c5].forEach(x=>x&&x.destroy());
 
-  q2Chart = new Chart(document.getElementById("q2Chart"), {
-    type: "pie",
-    data: {
-      labels: ["Yes","No"],
-      datasets: [{
-        data: [q2.Yes,q2.No],
-        backgroundColor: ["#66a6ff","#fbc2eb"]
-      }]
-    }
-  });
+c1=new Chart(document.getElementById("q1"),{
+type:"bar",
+data:{labels:["1","2","3","4"],datasets:[{data:q1,backgroundColor:"#667eea"}]}
+});
 
-  q3Chart = new Chart(document.getElementById("q3Chart"), {
-    type: "pie",
-    data: {
-      labels: ["Yes","No"],
-      datasets: [{
-        data: [q3.Yes,q3.No],
-        backgroundColor: ["#6a85f1","#ffb347"]
-      }]
-    }
-  });
+c2=new Chart(document.getElementById("q2"),{
+type:"pie",
+data:{labels:["Yes","No"],datasets:[{data:[q2.Yes,q2.No],backgroundColor:["#66a6ff","#fbc2eb"]}]}
+});
 
-  q4Chart = new Chart(document.getElementById("q4Chart"), {
-    type: "pie",
-    data: {
-      labels: ["Yes","No"],
-      datasets: [{
-        data: [q4.Yes,q4.No],
-        backgroundColor: ["#7b6cf6","#ff6b6b"]
-      }]
-    }
-  });
+c3=new Chart(document.getElementById("q3"),{
+type:"bar",
+data:{labels:Object.keys(q3),datasets:[{data:Object.values(q3),backgroundColor:"#7b6cf6"}]}
+});
 
-  q5Chart = new Chart(document.getElementById("q5Chart"), {
-    type: "pie",
-    data: {
-      labels: ["Yes","No"],
-      datasets: [{
-        data: [q5.Yes,q5.No],
-        backgroundColor: ["#5f9cff","#fbc2eb"]
-      }]
-    }
-  });
+c4=new Chart(document.getElementById("q4"),{
+type:"pie",
+data:{labels:["Yes","No"],datasets:[{data:[q4.Yes,q4.No],backgroundColor:["#6a85f1","#ff6b6b"]}]}
+});
+
+c5=new Chart(document.getElementById("q5"),{
+type:"pie",
+data:{labels:["Yes","No"],datasets:[{data:[q5.Yes,q5.No],backgroundColor:["#5f9cff","#fbc2eb"]}]}
+});
+
 });
 </script>
 
