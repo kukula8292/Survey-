@@ -7,8 +7,6 @@
 
 <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
 body {
   margin: 0;
@@ -41,7 +39,6 @@ h2 {
 .card {
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.1);
   padding: 20px;
   margin: 18px 0;
@@ -49,103 +46,33 @@ h2 {
   box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* GRID STYLE */
-.personRow {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 10px 0;
-}
-
 .personBox {
-  min-width: 90px;
-  text-align: center;
-  padding: 10px;
-  border-radius: 10px;
   background: rgba(255,255,255,0.12);
-}
-
-.tabs {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 10px 0 20px;
-}
-
-.tabs button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.15);
-  color: white;
-}
-
-.tabs button.active {
-  background: #667eea;
-}
-
-.section {
-  display: none;
-}
-
-.section.active {
-  display: block;
-}
-
-canvas {
-  background: rgba(255,255,255,0.95);
+  padding: 12px;
   border-radius: 12px;
-  padding: 10px;
-  margin-top: 12px;
+  margin: 10px 0;
+}
+
+.personTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #ffffff;
+}
+
+.why {
+  margin-top: 5px;
+  font-size: 13px;
+  opacity: 0.85;
+  color: #ffcccb;
 }
 </style>
 </head>
 
 <body>
 
-<h2>📊 Teacher Support Survey Analytics</h2>
+<h2>📊 Pyschology Survey Analytics</h2>
 
-<div class="tabs">
-  <button class="active" onclick="showTab('charts')">Charts</button>
-  <button onclick="showTab('table')">Table</button>
-  <button onclick="showTab('why')">Why Answers</button>
-</div>
-
-<div class="container">
-
-<!-- CHARTS -->
-<div id="charts" class="section active">
-  <div class="card">
-    <h3>Charts Section (unchanged)</h3>
-    <canvas id="q1"></canvas>
-    <canvas id="q2"></canvas>
-    <canvas id="q3"></canvas>
-    <canvas id="q4"></canvas>
-    <canvas id="q5"></canvas>
-  </div>
-</div>
-
-<!-- TABLE (NEW GRID VIEW) -->
-<div id="table" class="section">
-  <div class="card">
-    <h3>📊 Question Wise Responses</h3>
-    <div id="gridView"></div>
-  </div>
-</div>
-
-<!-- WHY -->
-<div id="why" class="section">
-  <div class="card">
-    <h3>Why Answers Section (unchanged)</h3>
-    <div id="whyMotivation"></div>
-    <div id="whyFocus"></div>
-    <div id="whyConfidence"></div>
-    <div id="whyEngagement"></div>
-  </div>
-</div>
-
-</div>
+<div class="container" id="dashboard"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -164,16 +91,8 @@ appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-window.showTab = function(tab){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-document.getElementById(tab).classList.add("active");
-event.target.classList.add("active");
-};
+const yesNo = v => v === "Yes" ? "👍 Yes" : "👎 No";
 
-onValue(ref(db,"responses"), snap=>{
-const list = Object.values(snap.val() || {});
-
-const yesNo = v => v==="Yes" ? "👍 Yes" : "👎 No";
 const helpMap = {
 Never:"❌ Never",
 Sometimes:"🙂 Sometimes",
@@ -181,51 +100,82 @@ Often:"🔥 Often",
 Always:"🚀 Always"
 };
 
+onValue(ref(db,"responses"), snap=>{
+const list = Object.values(snap.val() || {});
+
 let html = "";
 
 /* Q1 */
-html += `<div class="card"><h3>Q1 Support</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${d.support || "-"}</div>`;
+html += `<div class="card"><h3>Q1 - Support (1–4 Scale)</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${d.support}</div>
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
 /* Q2 */
-html += `<div class="card"><h3>Q2 Motivation</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${yesNo(d.motivation)}</div>`;
+html += `<div class="card"><h3>Q2 - Motivation</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.motivation)}</div>
+${d.motivation === "No" && d.motivationWhy ? `<div class="why">Why: ${d.motivationWhy}</div>` : ""}
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
 /* Q3 */
-html += `<div class="card"><h3>Q3 Help</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${helpMap[d.help] || d.help}</div>`;
+html += `<div class="card"><h3>Q3 - Help Frequency</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${helpMap[d.help] || d.help}</div>
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
 /* Q4 */
-html += `<div class="card"><h3>Q4 Focus</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${yesNo(d.focus)}</div>`;
+html += `<div class="card"><h3>Q4 - Focus</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.focus)}</div>
+${d.focus === "No" && d.focusWhy ? `<div class="why">Why: ${d.focusWhy}</div>` : ""}
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
 /* Q5 */
-html += `<div class="card"><h3>Q5 Confidence</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${yesNo(d.confidence)}</div>`;
+html += `<div class="card"><h3>Q5 - Confidence</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.confidence)}</div>
+${d.confidence === "No" && d.confidenceWhy ? `<div class="why">Why: ${d.confidenceWhy}</div>` : ""}
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
 /* Q6 */
-html += `<div class="card"><h3>Q6 Engagement</h3><div class="personRow">`;
-list.forEach(d=>{
-html += `<div class="personBox">${yesNo(d.engagement)}</div>`;
+html += `<div class="card"><h3>Q6 - Engagement</h3>`;
+list.forEach((d,i)=>{
+html += `
+<div class="personBox">
+<div class="personTitle">Person ${i+1}</div>
+<div>Answer: ${yesNo(d.engagement)}</div>
+${d.engagement === "No" && d.engagementWhy ? `<div class="why">Why: ${d.engagementWhy}</div>` : ""}
+</div>`;
 });
-html += `</div></div>`;
+html += `</div>`;
 
-document.getElementById("gridView").innerHTML = html;
+document.getElementById("dashboard").innerHTML = html;
 
 });
 </script>
