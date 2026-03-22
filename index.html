@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teacher Support Survey</title>
 
 <style>
@@ -11,21 +12,22 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
-  animation: bgShift 10s infinite alternate;
+  animation: bgShift 12s infinite alternate ease-in-out;
 }
 
 @keyframes bgShift {
   0% { background: linear-gradient(135deg, #667eea, #764ba2); }
-  50% { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
-  100% { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+  50% { background: linear-gradient(135deg, #6a85f1, #8360c3); }
+  100% { background: linear-gradient(135deg, #5f9cff, #7b6cf6); }
 }
 
 .form-card {
   background: white;
-  padding: 30px;
+  padding: 25px;
   border-radius: 15px;
-  width: 600px;
-  margin: 60px auto;
+  width: 90%;
+  max-width: 600px;
+  margin: 40px auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   animation: fadeIn 0.8s ease;
 }
@@ -40,7 +42,7 @@ body {
 
 select, textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
 }
@@ -92,6 +94,27 @@ footer {
 
 @keyframes fall {
   to { transform: translateY(110vh); }
+}
+
+/* Mobile optimization */
+@media (max-width: 600px) {
+  .form-card {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  select {
+    font-size: 14px;
+  }
 }
 </style>
 
@@ -182,22 +205,41 @@ const db = getDatabase(app);
 document.getElementById("surveyForm").onsubmit = function(e){
   e.preventDefault();
 
+  const btn = document.querySelector("button");
+
+  const support = document.getElementById("support").value;
+  const motivation = document.getElementById("motivation").value;
+  const help = document.getElementById("help").value;
+  const focus = document.getElementById("focus").value;
+  const confidence = document.getElementById("confidence").value;
+  const engagement = document.getElementById("engagement").value;
+
+  btn.disabled = true;
+
   push(ref(db, "responses"), {
-    support: support.value,
-    motivation: motivation.value,
-    help: help.value,
-    focus: focus.value,
-    confidence: confidence.value,
-    engagement: engagement.value,
+    support,
+    motivation,
+    help,
+    focus,
+    confidence,
+    engagement,
     time: new Date().toLocaleString()
+  })
+  .then(() => {
+    let msg = document.createElement("div");
+    msg.className = "thankyou";
+    msg.innerHTML = "🔥 THANK YOU! 🔥<br>Response submitted 📊";
+    document.body.appendChild(msg);
+
+    setTimeout(() => msg.remove(), 3000);
+
+    document.getElementById("surveyForm").reset();
+    btn.disabled = false;
+  })
+  .catch((err) => {
+    alert("Error submitting: " + err.message);
+    btn.disabled = false;
   });
-
-  let msg = document.createElement("div");
-  msg.className = "thankyou";
-  msg.innerHTML = "🔥 THANK YOU! 🔥<br>Response submitted 📊";
-  document.body.appendChild(msg);
-
-  document.getElementById("surveyForm").reset();
 };
 
 // Emoji rain
@@ -210,7 +252,7 @@ setInterval(() => {
   e.style.animationDuration = (Math.random()*3+3)+"s";
   document.body.appendChild(e);
   setTimeout(()=>e.remove(),6000);
-},300);
+},500);
 
 </script>
 
