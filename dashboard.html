@@ -1,74 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Dashboard</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe);
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+    <title>Survey</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // Your Firebase configuration
+        var firebaseConfig = { /* Your Firebase Config Here */ };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to submit survey response
+        function submitSurveyResponse() {
+            var surveyData = { /* Get survey data */ };
+            firebase.database().ref('responses/').push(surveyData);
         }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            margin: 20px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: scale(1.05);
-        }
-        @media(max-width: 600px) {
-            body {
-                flex-direction: column;
-            }
-        }
-    </style>
+    </script>
 </head>
 <body>
-
-<div class="card">
-    <h1>Survey Responses</h1>
-    <div id="responses"></div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js"></script>
-<script>
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        databaseURL: "YOUR_DATABASE_URL",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
-
-    // Fetch and display survey responses
-    database.ref('surveyResponses').on('value', (snapshot) => {
-        const responses = snapshot.val();
-        const responsesDiv = document.getElementById('responses');
-        responsesDiv.innerHTML = '';
-        for (const id in responses) {
-            responsesDiv.innerHTML += `<p>${responses[id]}</p>`;
-        }
-    });
-</script>
-
+    <h1>Survey</h1>
+    <form onsubmit="submitSurveyResponse(); return false;">
+        <label for="response">Your Response:</label>
+        <input type="text" id="response" name="response" required>
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
