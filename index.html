@@ -92,7 +92,7 @@ button {
 
 .hidden { display: none; }
 
-/* THANK YOU CARD */
+
 #thankYouCard {
   position: fixed;
   top: 50%;
@@ -115,7 +115,7 @@ button {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* CONFETTI */
+
 .confetti {
   position: fixed;
   width: 8px;
@@ -255,17 +255,21 @@ setTimeout(()=>c.remove(),4000);
 }
 
 function setup(selectId, textId){
-const s = document.getElementById(selectId);
-const t = document.getElementById(textId);
+  const s = document.getElementById(selectId);
+  const t = document.getElementById(textId);
 
-s.addEventListener("change", () => {
-if(s.value === "No"){
-t.classList.remove("hidden");
-}else{
-t.classList.add("hidden");
-t.value = "";
-}
-});
+  // set placeholder once
+  t.placeholder = "Why?";
+
+  s.addEventListener("change", () => {
+    if(s.value === "No"){
+      t.classList.remove("hidden");
+      t.placeholder = "Why?"; // ensure it shows
+    } else {
+      t.classList.add("hidden");
+      t.value = "";
+    }
+  });
 }
 
 setup("motivation","motivationWhy");
