@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Support Survey</title>
+</head>
+<body>
+
+<h2>Teacher Support Survey</h2>
+
+<form id="surveyForm">
+  <label>1. Support Level (1-4):</label><br>
+  <select id="support">
+    <option>1</option>
+    <option>2</option>
+    <option>3</option>
+    <option>4</option>
+  </select><br><br>
+
+  <label>2. Motivated with encouragement?</label><br>
+  <select id="motivation">
+    <option>Yes</option>
+    <option>No</option>
+  </select><br><br>
+
+  <label>3. Ask teacher for help?</label><br>
+  <select id="help">
+    <option>Never</option>
+    <option>Sometimes</option>
+    <option>Often</option>
+    <option>Always</option>
+  </select><br><br>
+
+  <label>4. Does support improve focus?</label><br>
+  <select id="focus">
+    <option>Yes</option>
+    <option>No</option>
+  </select><br><br>
+
+  <label>5. Confidence due to encouragement?</label><br>
+  <select id="confidence">
+    <option>Yes</option>
+    <option>No</option>
+  </select><br><br>
+
+  <label>6. Want more interactive feedback?</label><br>
+  <select id="engagement">
+    <option>Yes</option>
+    <option>No</option>
+  </select><br><br>
+
+  <button type="submit">Submit</button>
+</form>
+
+<br>
+<a href="dashboard.html">Go to Dashboard</a>
+
+<script>
+document.getElementById("surveyForm").onsubmit = function(e){
+  e.preventDefault();
+
+  let data = JSON.parse(localStorage.getItem("surveyData") || "[]");
+
+  data.push({
+    support: document.getElementById("support").value,
+    motivation: document.getElementById("motivation").value,
+    help: document.getElementById("help").value,
+    focus: document.getElementById("focus").value,
+    confidence: document.getElementById("confidence").value,
+    engagement: document.getElementById("engagement").value
+  });
+
+  localStorage.setItem("surveyData", JSON.stringify(data));
+
+  alert("Response saved!");
+};
+</script>
+
+</body>
+</html>
