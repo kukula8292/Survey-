@@ -60,16 +60,20 @@ h2 {
   color: #2b2b2b;
 }
 
-.question { margin-bottom: 18px; }
+.question { margin-bottom: 22px; }
 
-label { font-weight: 600; color: #333; }
+label {
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4em;
+}
 
 select, textarea {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 textarea { height: 60px; resize: none; }
@@ -138,7 +142,10 @@ button {
 <form id="surveyForm">
 
 <div class="question">
-<label>1. On a scale of 1-4, how much support do you feel you receive?</label>
+<label>
+1. On a scale of 1–4, how much support (help/feedback) do you feel you receive from your teachers?
+<br>(1: Very Little, 2: Some, 3: Sufficient, 4: High Support)
+</label>
 <select id="support">
 <option value="1">1 Very Little</option>
 <option value="2">2 Some</option>
@@ -148,7 +155,10 @@ button {
 </div>
 
 <div class="question">
-<label>2. Do you feel more motivated? (Yes / No)</label>
+<label>
+2. Do you feel more motivated to study a subject when the teacher provides regular encouragement?
+<br>(Yes / No)
+</label>
 <select id="motivation">
 <option>Yes</option>
 <option>No</option>
@@ -157,7 +167,10 @@ button {
 </div>
 
 <div class="question">
-<label>3. How often do you ask for help?</label>
+<label>
+3. How often do you ask your teacher for help when you don't understand a topic?
+<br>(Never, Sometimes, Often, Always)
+</label>
 <select id="help">
 <option>Never</option>
 <option>Sometimes</option>
@@ -167,7 +180,10 @@ button {
 </div>
 
 <div class="question">
-<label>4. Does support improve focus? (Yes / No)</label>
+<label>
+4. Do you think teacher support (e.g., clear feedback) improves your ability to focus and learn?
+<br>(Yes / No, please explain why)
+</label>
 <select id="focus">
 <option>Yes</option>
 <option>No</option>
@@ -176,7 +192,10 @@ button {
 </div>
 
 <div class="question">
-<label>5. Confidence from teachers? (Yes / No)</label>
+<label>
+5. Have you ever felt more confident in an exam because of a teacher's encouragement?
+<br>(Yes / No)
+</label>
 <select id="confidence">
 <option>Yes</option>
 <option>No</option>
@@ -185,7 +204,10 @@ button {
 </div>
 
 <div class="question">
-<label>6. More engagement? (Yes / No)</label>
+<label>
+6. Would you be more engaged in class if teachers provided more interactive feedback?
+<br>(Yes / No, please explain why)
+</label>
 <select id="engagement">
 <option>Yes</option>
 <option>No</option>
@@ -217,7 +239,6 @@ appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* confetti */
 function launchConfetti(){
 const colors = ["#667eea","#764ba2","#ffffff","#ffcc00","#ff6b6b"];
 
@@ -270,11 +291,7 @@ time: new Date().toLocaleString()
 });
 
 document.getElementById("surveyForm").reset();
-
-/* THANK YOU CARD */
 document.getElementById("thankYouCard").classList.add("show");
-
-/* CONFETTI */
 launchConfetti();
 };
 </script>
