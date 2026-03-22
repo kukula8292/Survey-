@@ -2,30 +2,117 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survey Analytics Dashboard</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-  font-family: Arial;
-  background: #111;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
   color: white;
+}
+
+h2 {
   text-align: center;
+  margin: 20px 0;
+}
+
+.container {
+  width: 95%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  animation: fade 0.4s ease;
+}
+
+@keyframes fade {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.summary {
+  margin: 10px 0;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 canvas {
-  max-width: 600px;
-  margin: 30px auto;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Survey Dashboard</h2>
+<h2>Teacher Support Survey Analytics</h2>
 
-<canvas id="supportChart"></canvas>
-<canvas id="motivationChart"></canvas>
+<div class="container">
+
+  <!-- Q1 -->
+  <div class="card">
+    <div class="title">
+      Q1: On a scale of 1-4, how much support (help/feedback) do you feel you receive from your teachers?
+    </div>
+    <div class="summary" id="q1Text"></div>
+    <canvas id="q1Chart"></canvas>
+  </div>
+
+  <!-- Q2 -->
+  <div class="card">
+    <div class="title">
+      Q2: Do you feel more motivated to study when teachers provide regular encouragement?
+    </div>
+    <div class="summary" id="q2Text"></div>
+    <canvas id="q2Chart"></canvas>
+  </div>
+
+  <!-- Q3 -->
+  <div class="card">
+    <div class="title">
+      Q3: Do you think teacher support improves your ability to focus and learn?
+    </div>
+    <div class="summary" id="q3Text"></div>
+    <canvas id="q3Chart"></canvas>
+  </div>
+
+  <!-- Q4 -->
+  <div class="card">
+    <div class="title">
+      Q4: Have you ever felt more confident in an exam because of teacher encouragement?
+    </div>
+    <div class="summary" id="q4Text"></div>
+    <canvas id="q4Chart"></canvas>
+  </div>
+
+  <!-- Q5 -->
+  <div class="card">
+    <div class="title">
+      Q5: Would you be more engaged if teachers provided more interactive feedback?
+    </div>
+    <div class="summary" id="q5Text"></div>
+    <canvas id="q5Chart"></canvas>
+  </div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -44,31 +131,107 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+let q1Chart, q2Chart, q3Chart, q4Chart, q5Chart;
+
 onValue(ref(db, "responses"), (snapshot) => {
   const data = snapshot.val();
-  const list = Object.values(data || {});
+  const list = Object.values(data || []);
 
-  let support = [0,0,0,0];
-  let motivation = {Yes:0, No:0};
+  // Q1 (1–4 scale)
+  let q1 = [0,0,0,0];
+
+  // Yes/No questions
+  let q2 = {Yes:0, No:0};
+  let q3 = {Yes:0, No:0};
+  let q4 = {Yes:0, No:0};
+  let q5 = {Yes:0, No:0};
 
   list.forEach(d => {
-    support[d.support-1]++;
-    motivation[d.motivation]++;
+    if (d.support) q1[d.support - 1]++;
+    if (d.motivation) q2[d.motivation]++;
+    if (d.focus) q3[d.focus]++;
+    if (d.confidence) q4[d.confidence]++;
+    if (d.engagement) q5[d.engagement]++;
   });
 
-  new Chart(document.getElementById("supportChart"), {
-    type: 'bar',
+  // TEXT SUMMARY
+  document.getElementById("q1Text").innerHTML =
+    `Total responses: ${list.length}<br>
+    1 (Very Little): ${q1[0]}<br>
+    2 (Some): ${q1[1]}<br>
+    3 (Sufficient): ${q1[2]}<br>
+    4 (High Support): ${q1[3]}`;
+
+  document.getElementById("q2Text").innerHTML =
+    `Yes: ${q2.Yes} students<br>No: ${q2.No} students`;
+
+  document.getElementById("q3Text").innerHTML =
+    `Yes: ${q3.Yes} students<br>No: ${q3.No} students`;
+
+  document.getElementById("q4Text").innerHTML =
+    `Yes: ${q4.Yes} students<br>No: ${q4.No} students`;
+
+  document.getElementById("q5Text").innerHTML =
+    `Yes: ${q5.Yes} students<br>No: ${q5.No} students`;
+
+  // destroy old charts
+  [q1Chart,q2Chart,q3Chart,q4Chart,q5Chart].forEach(c => c && c.destroy());
+
+  // CHARTS
+
+  q1Chart = new Chart(document.getElementById("q1Chart"), {
+    type: "bar",
     data: {
       labels: ["1","2","3","4"],
-      datasets: [{ label: "Support Levels", data: support }]
+      datasets: [{
+        label: "Support Level",
+        data: q1,
+        backgroundColor: "#667eea"
+      }]
     }
   });
 
-  new Chart(document.getElementById("motivationChart"), {
-    type: 'bar',
+  q2Chart = new Chart(document.getElementById("q2Chart"), {
+    type: "pie",
     data: {
       labels: ["Yes","No"],
-      datasets: [{ label: "Motivation", data: [motivation.Yes, motivation.No] }]
+      datasets: [{
+        data: [q2.Yes,q2.No],
+        backgroundColor: ["#66a6ff","#fbc2eb"]
+      }]
+    }
+  });
+
+  q3Chart = new Chart(document.getElementById("q3Chart"), {
+    type: "pie",
+    data: {
+      labels: ["Yes","No"],
+      datasets: [{
+        data: [q3.Yes,q3.No],
+        backgroundColor: ["#6a85f1","#ffb347"]
+      }]
+    }
+  });
+
+  q4Chart = new Chart(document.getElementById("q4Chart"), {
+    type: "pie",
+    data: {
+      labels: ["Yes","No"],
+      datasets: [{
+        data: [q4.Yes,q4.No],
+        backgroundColor: ["#7b6cf6","#ff6b6b"]
+      }]
+    }
+  });
+
+  q5Chart = new Chart(document.getElementById("q5Chart"), {
+    type: "pie",
+    data: {
+      labels: ["Yes","No"],
+      datasets: [{
+        data: [q5.Yes,q5.No],
+        backgroundColor: ["#5f9cff","#fbc2eb"]
+      }]
     }
   });
 });
