@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Psychology Survey</title>
+<title>Teacher Support Survey</title>
 
 <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
 
@@ -20,14 +20,12 @@ body {
   animation: bgShift 15s ease infinite;
 }
 
-/* smoother gradient motion */
 @keyframes bgShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* emoji rain */
 .emoji {
   position: fixed;
   top: -20px;
@@ -45,7 +43,6 @@ body {
   }
 }
 
-/* card depth upgrade */
 .form-card {
   background: rgba(255,255,255,0.92);
   backdrop-filter: blur(10px);
@@ -54,32 +51,18 @@ body {
   width: 90%;
   max-width: 650px;
   margin: 40px auto;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  transform: translateY(0);
-  transition: 0.3s ease;
-}
-
-.form-card:hover {
-  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
 
 h2 {
   text-align: center;
   font-weight: 700;
   color: #2b2b2b;
-  letter-spacing: 0.5px;
 }
 
-.question {
-  margin-bottom: 18px;
-}
+.question { margin-bottom: 18px; }
 
-label {
-  font-weight: 600;
-  color: #333;
-}
+label { font-weight: 600; color: #333; }
 
 select, textarea {
   width: 100%;
@@ -87,19 +70,9 @@ select, textarea {
   border-radius: 10px;
   border: 1px solid #ccc;
   margin-top: 6px;
-  outline: none;
-  transition: 0.2s;
 }
 
-select:focus, textarea:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 8px rgba(102,126,234,0.3);
-}
-
-textarea {
-  resize: none;
-  height: 60px;
-}
+textarea { height: 60px; resize: none; }
 
 button {
   width: 100%;
@@ -109,19 +82,13 @@ button {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   font-size: 16px;
-  cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.02);
+  cursor: pointer;
 }
 
 .hidden { display: none; }
 
-/* THANK YOU MODAL */
+/* THANK YOU CARD */
 #thankYouCard {
   position: fixed;
   top: 50%;
@@ -143,6 +110,23 @@ button:hover {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
 }
+
+/* CONFETTI */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  top: 0;
+  z-index: 9999;
+  animation: confettiFall 3s linear forwards;
+}
+
+@keyframes confettiFall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 
@@ -154,26 +138,26 @@ button:hover {
 <form id="surveyForm">
 
 <div class="question">
-<label>1. On a scale of 1-4, how much support (help/feedback) do you feel you receive from your teachers?</label>
+<label>1. On a scale of 1-4, how much support do you feel you receive?</label>
 <select id="support">
-<option value="1">Very Little</option>
-<option value="2">Some</option>
-<option value="3">Sufficient</option>
-<option value="4">High Support</option>
+<option value="1">1 Very Little</option>
+<option value="2">2 Some</option>
+<option value="3">3 Sufficient</option>
+<option value="4">4 High Support</option>
 </select>
 </div>
 
 <div class="question">
-<label>2. Do you feel more motivated to study a subject when the teacher provides regular encouragement? (Yes / No)</label>
+<label>2. Do you feel more motivated? (Yes / No)</label>
 <select id="motivation">
 <option>Yes</option>
 <option>No</option>
 </select>
-<textarea id="motivationWhy" class="hidden" placeholder="If No, why?"></textarea>
+<textarea id="motivationWhy" class="hidden"></textarea>
 </div>
 
 <div class="question">
-<label>3. How often do you ask your teacher for help when you don't understand a topic?</label>
+<label>3. How often do you ask for help?</label>
 <select id="help">
 <option>Never</option>
 <option>Sometimes</option>
@@ -183,30 +167,30 @@ button:hover {
 </div>
 
 <div class="question">
-<label>4. Do you think teacher support (e.g., clear feedback) improves your ability to focus and learn? (Yes / No)</label>
+<label>4. Does support improve focus? (Yes / No)</label>
 <select id="focus">
 <option>Yes</option>
 <option>No</option>
 </select>
-<textarea id="focusWhy" class="hidden" placeholder="If No, why?"></textarea>
+<textarea id="focusWhy" class="hidden"></textarea>
 </div>
 
 <div class="question">
-<label>5. Have you ever felt more confident in an exam because of a teacher's encouragement? (Yes / No)</label>
+<label>5. Confidence from teachers? (Yes / No)</label>
 <select id="confidence">
 <option>Yes</option>
 <option>No</option>
 </select>
-<textarea id="confidenceWhy" class="hidden" placeholder="If No, why?"></textarea>
+<textarea id="confidenceWhy" class="hidden"></textarea>
 </div>
 
 <div class="question">
-<label>6. Would you be more engaged in class if teachers provided more interactive feedback? (Yes / No)</label>
+<label>6. More engagement? (Yes / No)</label>
 <select id="engagement">
 <option>Yes</option>
 <option>No</option>
 </select>
-<textarea id="engagementWhy" class="hidden" placeholder="If No, why?"></textarea>
+<textarea id="engagementWhy" class="hidden"></textarea>
 </div>
 
 <button type="submit">Submit</button>
@@ -214,7 +198,6 @@ button:hover {
 </form>
 </div>
 
-<!-- THANK YOU CARD -->
 <div id="thankYouCard">🙏 Thank you for your contribution putha!</div>
 
 <script type="module">
@@ -233,6 +216,22 @@ appId:"1:1033254869246:web:4c2b01a374c85ca509adaf"
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+/* confetti */
+function launchConfetti(){
+const colors = ["#667eea","#764ba2","#ffffff","#ffcc00","#ff6b6b"];
+
+for(let i=0;i<80;i++){
+const c = document.createElement("div");
+c.classList.add("confetti");
+c.style.left = Math.random()*100 + "vw";
+c.style.background = colors[Math.floor(Math.random()*colors.length)];
+c.style.animationDuration = (2 + Math.random()*2) + "s";
+document.body.appendChild(c);
+
+setTimeout(()=>c.remove(),4000);
+}
+}
 
 function setup(selectId, textId){
 const s = document.getElementById(selectId);
@@ -253,22 +252,6 @@ setup("focus","focusWhy");
 setup("confidence","confidenceWhy");
 setup("engagement","engagementWhy");
 
-/* emoji rain */
-const emojis = ["🎓","📚","✏️","🧑‍🏫","📖","📝","🔬","🏫","📆","✂️","📗","🧑‍🏫"];
-
-function dropEmoji(){
-const e = document.createElement("div");
-e.classList.add("emoji");
-e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
-e.style.left = Math.random()*100 + "vw";
-e.style.animationDuration = (3 + Math.random()*3) + "s";
-document.body.appendChild(e);
-
-setTimeout(()=> e.remove(), 6000);
-}
-setInterval(dropEmoji, 400);
-
-/* submit handler */
 document.getElementById("surveyForm").onsubmit = function(e){
 e.preventDefault();
 
@@ -288,15 +271,11 @@ time: new Date().toLocaleString()
 
 document.getElementById("surveyForm").reset();
 
-/* show thank you card */
-const card = document.getElementById("thankYouCard");
-card.classList.add("show");
+/* THANK YOU CARD */
+document.getElementById("thankYouCard").classList.add("show");
 
-setTimeout(()=> {
-card.classList.remove("show");
-}, 3000);
-
-alert("Submitted!");
+/* CONFETTI */
+launchConfetti();
 };
 </script>
 
